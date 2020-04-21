@@ -19,6 +19,8 @@ city_code:
 ````
 Either `cities`, `lathlons`, `zips`, or `city_code` can be provided.
 
+The city_codes that I added can be found **[here](http://bulk.openweathermap.org/sample/)**  
+
 Requirements:
  - Prometheus' Pushgateway installed and running on `localhost:9091`
  - Perl with packages `liblwp-useragent-determined-perl`, `libjson-perl` and `libconfig-yaml-perl`
