@@ -67,6 +67,12 @@ if ($config->{zips}) {
         }
 }
 
+if ($config->{city_code}) {
+        foreach my $city_id (@{$config->{city_code}}) {
+                push @urls, "http://api.openweathermap.org/data/2.5/weather?id=$city_id,us&appid=$api_key";
+        }
+}
+
 foreach my $url (@urls) {
         my $api_key=$config->{api_key};
         my $json = $ua->get($url);
