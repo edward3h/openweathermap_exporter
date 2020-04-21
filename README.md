@@ -19,16 +19,19 @@ city_code:
 ````
 Either `cities`, `lathlons`, `zips`, or `city_code` can be provided.
 
+
 The city_codes that I added can be found **[here](http://bulk.openweathermap.org/sample/)**  
 
-The unit_format can be updated to provide different output based on your region  
+
+The `unit_format` in the `openweathermap_exporter` can be changed to provide different output based on your region  
 ```
 # Options are: Default (kelvin), Metric (centegrade), or Imperial (farenheit)  
 # This will update all readings to the unit format you select  
 my $unit_format = "Imperial";
 ```
+---
 
-Requirements:
+**Requirements:**
  - Prometheus' Pushgateway installed and running on `localhost:9091`
  - Perl with packages `liblwp-useragent-determined-perl`, `libjson-perl` and `libconfig-yaml-perl`
 
@@ -41,4 +44,6 @@ An example `prometheus.yml` configuration looks like:
     honor_labels: true
     static_configs:
       - targets: ['localhost:9091']
+        labels:
+          alias: 'openweathermap'
 ````
