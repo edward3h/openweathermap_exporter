@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+# sample API call for reference -  
+# http://api.openweathermap.org/data/2.5/weather?units=<unit_format>&id=<city_code>&APPID=<api_key>  
 
 use strict;
 use warnings;
