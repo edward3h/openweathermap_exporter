@@ -14,8 +14,10 @@ latlons:
   - [40.2010176,-72.6806685]
 zips:
   - 90210
+city_code: 
+  - 4259418
 ````
-Either `cities`, `lathlons` or `zips` can be provided.
+Either `cities`, `lathlons`, `zips`, or `city_code` can be provided.
 
 Requirements:
  - Prometheus' Pushgateway installed and running on `localhost:9091`
