@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+# sample API call for reference -  
+# http://api.openweathermap.org/data/2.5/weather?units=<unit_format>&id=<city_code>&APPID=<api_key>  
 
 use strict;
 use warnings;
@@ -9,6 +11,10 @@ use Config::YAML;
 use JSON;
 use LWP::UserAgent::Determined;
 use URI::Escape;
+
+# Options are: Default (kelvin), Metric (centegrade), or Imperial (farenheit)  
+# This will update all readings to the unit format you select  
+my $unit_format = "Imperial";
 
 my $configFile = $ARGV[0] || "openweathermap_exporter.yml";
 my $port = $ARGV[1] || "9091";
@@ -49,7 +55,7 @@ my $pushgateway = defined $config->{pushgateway} ? $config->{pushgateway} : 'loc
 
 if ($config->{cities}) {
         foreach my $city (@{$config->{cities}}) {
-                push @urls, "http://api.openweathermap.org/data/2.5/weather?q=". uri_escape($city) ."&appid=$api_key";
+                push @urls, "http://api.openweathermap.org/data/2.5/weather?units=$unit_format&q=". uri_escape($city) ."&appid=$api_key";
         }
 }
 
@@ -57,13 +63,19 @@ if ($config->{latlons}) {
         foreach my $latlon (@{$config->{latlons}}) {
                 my $lat = $latlon->[0];
                 my $lon = $latlon->[1];
-                push @urls, "http://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$api_key";
+                push @urls, "http://api.openweathermap.org/data/2.5/weather?units=$unit_format&lat=$lat&lon=$lon&appid=$api_key";
         }
 }
 
 if ($config->{zips}) {
         foreach my $zip (@{$config->{zips}}) {
-                push @urls, "http://api.openweathermap.org/data/2.5/weather?zip=$zip,us&appid=$api_key";
+                push @urls, "http://api.openweathermap.org/data/2.5/weather?units=$unit_format&zip=$zip,us&appid=$api_key";
+        }
+}
+
+if ($config->{city_code}) {
+        foreach my $city_id (@{$config->{city_code}}) {
+                push @urls, "http://api.openweathermap.org/data/2.5/weather?units=$unit_format&id=$city_id,us&appid=$api_key";
         }
 }
 
@@ -79,13 +91,13 @@ foreach my $url (@urls) {
 
         $output .= "weather_return_code{name=\"$decoded_json->{name}\"} $decoded_json->{cod}\n";
 
-        $output .= "weather_temperature_kelvin{name=\"$decoded_json->{name}\",type=\"current\"} $decoded_json->{main}{temp}\n";
-        $output .= "weather_temperature_kelvin{name=\"$decoded_json->{name}\",type=\"max\"} $decoded_json->{main}{temp_max}\n";
-        $output .= "weather_temperature_kelvin{name=\"$decoded_json->{name}\",type=\"min\"} $decoded_json->{main}{temp_min}\n";
+        $output .= "weather_temperature_$unit_format{name=\"$decoded_json->{name}\",type=\"current\"} $decoded_json->{main}{temp}\n";
+        $output .= "weather_temperature_$unit_format{name=\"$decoded_json->{name}\",type=\"max\"} $decoded_json->{main}{temp_max}\n";
+        $output .= "weather_temperature_$unit_format{name=\"$decoded_json->{name}\",type=\"min\"} $decoded_json->{main}{temp_min}\n";
 
         $output .= "weather_measurement_epoch{name=\"$decoded_json->{name}\"} $decoded_json->{dt}\n";
 
-        $output .= "weather_wind_meters_per_second{name=\"$decoded_json->{name}\"} $decoded_json->{wind}{speed}\n";
+        $output .= "weather_wind_per_second_$unit_format{name=\"$decoded_json->{name}\"} $decoded_json->{wind}{speed}\n";
 
         # This is not always returned
         $output .= "weather_wind_direction{name=\"$decoded_json->{name}\"} $decoded_json->{wind}{deg}\n"
